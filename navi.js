@@ -40,31 +40,33 @@ function onFailedCallback(sender, args) {
 }
 
 function buildMenu(aList) {
-    // var menuHTML = "<div class='menu horizontal menu-horizontal'><ul class=''>";
     if (aList.length > 0) {
-        console.info("building menu");
+        // console.info("building menu");
         var menu = {
-            innerHtml: "<div class=''>"
+            innerHtml: "<div class='menu horizontal menu-horizontal'><ul class='root static'>"
         };
-        // for (var i = 0, len = aList.length; i < len; i++) {
-        //     menuHTML += String.format("<li>{0}</li>", aList[i].title);
-        //     if (aList[i].submenus.lenght > 0)
-        //         buildMenu(aList[i].submenus, menuHTML);
-        //     //menuHTML += String.format("<li class='static selected'><a class='static selected menu-item' href='{1}'><span class='additional-background'><span class='menu-item-text'>{0}</span></span></a></li>", aList[i].title, aList[i].url);
-        // }
-
+        //Adding homepage link.
+        menu.innerHtml += "<li class='static selected'><a class='static selected menu-item' href='/SitePages/Home.aspx' accesskey='1'><span class='additional-background'><span class='menu-item-text'>Home Page</span><span class='ms-hidden'>Currently selected</span></span></a>";
         buildSubMenu(aList, menu);
-        menu.innerHtml += "</div>";
+        menu.innerHtml += "</ul></div>";
+        //Need to set the first UL as root.
         $('#top-navigation-bar').html(menu.innerHtml);
+        // $('#top-navigation-bar ul:first-child').addClass('root');
+
     }
 }
 
 function buildSubMenu(aList, menu) {
-    menu.innerHtml += "<ul>";
+    menu.innerHtml += "<ul class='static'>";
     for (var i = 0, len = aList.length; i < len; i++) {
-        menu.innerHtml += String.format("<li>{0}</li>", aList[i].title);
+        var subClass = "";
         if (aList[i].submenus.length > 0)
+            subClass = "dynamic-children"
+
+        menu.innerHtml += String.format("<li class='static " + subClass + "'><a href='{0}' class='static menu-item " + subClass + "'><span class='additional-background'><span class='menu-item-text'>{1}</span></span></a>", aList[i].url, aList[i].title);
+        if (subClass != "")
             buildSubMenu(aList[i].submenus, menu);
+        menu.innerHtml += "</li>";
     }
     menu.innerHtml += "</ul>";
 }
@@ -88,7 +90,7 @@ function onloadTopNavigationCallback(sender, args) {
 }
 
 function createList() {
-    console.info("creating list");
+    // console.info("creating list");
     var templist = [];
     var enumerator = this.allMenuItems.getEnumerator();
     while (enumerator.moveNext()) {
@@ -112,14 +114,15 @@ function createList() {
 }
 
 function addChildren(node, source) {
-    console.info("addChildren to " + node.title);
+    // console.info("addChildren to " + node.title);
     for (var i = 0, len = source.length; i < len; i++) {
-        console.info("Parent ID: " + source[i].parentId + " ?? Node ID: " + node.id);
+        // console.info("Parent ID: " + source[i].parentId + " ?? Node ID: " + node.id);
         if (source[i].parentId == node.id) {
-            console.info("match");
+            // console.info("match");
             node.submenus.push(source[i]);
             addChildren(source[i], source);
         }
     }
 }
+
 ExecuteOrDelayUntilScriptLoaded(loadTopNavigation, 'sp.js');
